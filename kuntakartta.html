@@ -13,22 +13,21 @@
     <style type="text/css">
 .ui-widget {
     font-size: 8pt;
-
 }
+
 .ui-buttonset .ui-button {
     margin-right: -5px;
 }
 
 #fig {
   width: 560px;
-  height: 500px;
+  height: 400px;
   margin-top: 10px;
 }
 
 #container {
   height: 80px;
 }
-
     </style>
   </head>
   <body><div id="center"><div id="fig">
@@ -55,24 +54,24 @@ $("#buttons").buttonset();
 
 var i = 0,
     w = 560,
-    h = 300,
-    mapMargin = 30;
+    h = 500,
+    mapMargin = 10;
     
 
 var scale = pv.Geo.scale()
-    .domain({lng: 20, lat: 40}, {lng: 30, lat: 65})
+    .domain({lng: 20, lat: 55}, {lng: 32, lat: 69})
     .range({x: mapMargin, y: mapMargin}, {x: w-mapMargin, y: h-mapMargin});
 
-var legendMargin = 500,
+var legendMargin = 0,
     ease = null,
-    yearsMargin = 100;
+    yearsMargin = 0;
 
 var yearsScale = pv.Scale.linear()
     .domain(1, 9)
     .range(1, 9);
 
 var legendScale = pv.Scale.linear()
-    .domain(0, 4000)
+    .domain(0, 5000)
     .range(legendMargin, w - legendMargin);
 
 var col = function(v) {
@@ -86,7 +85,7 @@ var col = function(v) {
 };
 
 var numToRad = function(n) {
-  return Math.sqrt(n)/20;
+  return Math.sqrt(n)/18;
 };
 
 var nodes = [],
@@ -153,7 +152,7 @@ var sim = pv.simulation(nodes)
 var vis = new pv.Panel()
     .width(w)
     .height(h)
-    .top(50)
+    .top(0)
     .bottom(30);
 
 
@@ -183,7 +182,7 @@ vis.add(pv.Dot)
     .fillStyle(null)
     .strokeStyle("#555")
     .left(150)
-    .bottom(-30)
+    .bottom(50)
     .radius(function(d) numToRad(d.v))
   .anchor("top").add(pv.Label)
     .text(function(d) d.l)
@@ -202,7 +201,7 @@ vis.add(pv.Bar)
     .text(function(d) d + " - " + (d+999 )+ " €");
 
 ease = setInterval(function() {
-  if (i++ > 140) {
+  if (i++ > 200) {
     clearInterval(ease);
     ease = null;
   }
