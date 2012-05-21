@@ -3,14 +3,21 @@
   <meta charset="UTF-8" />
     <title>Kuntatalouspallot</title>
     <link type="text/css" rel="stylesheet" href="ex.css"/>
-    <link type="text/css" rel="stylesheet" href="jquery-ui-1.8rc3.custom.css"/>
+    <link type="text/css" rel="stylesheet" href="jquery-ui-1.8.20.custom.css"/>
     <script type="text/javascript" src="protovis-r3.2.js"></script>
-    <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="jquery-ui-1.8rc3.custom.min.js"></script>
+    <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.8.20.custom.min.js"></script>
     <script type="text/javascript" src="centroid.js"></script>
     <script type="text/javascript" src="fi_lowres.js"></script>
     <script type="text/javascript" src="fi_stats.js"></script>
     <style type="text/css">
+.ui-widget {
+    font-size: 8pt;
+
+}
+.ui-buttonset .ui-button {
+    margin-right: -5px;
+}
 
 #fig {
   width: 560px;
@@ -29,20 +36,22 @@
     <div id="container">
       <b id="buttonslabel">Mittari:</b>
       <div id="buttons">
-        <button id="btn_laina">Lainat/asukas</button>
-        <button id="btn_">Suhteellinen velka</button>
-        <button id="btn_">Verotulot/asukas</button>
-        <button id="btn_">Valtionosuus/asukas</button>
-        <!-- button id="btn_">Tulovero-%</button -->
+<input type="radio" id="radio1" name="mittari" checked="checked" /><label for="radio1">Lainat/asukas</label>
+<input type="radio" id="radio2" name="mittari" /><label for="radio2">Suhteellinen velka</label>
+<input type="radio" id="radio3" name="mittari" /><label for="radio3">Verotulot/asukas</label>
+<input type="radio" id="radio4" name="mittari" /><label for="radio4">Valtionosuus/asukas</label>
+<input type="radio" id="radio5" name="mittari" /><label for="radio5">Tulovero-%</label>
       </div>
     </div>
     <script type="text/javascript+protovis">
-$(btn_laina).bind("click", function(e, ui) {
+$("#buttons input").bind("click", function(e, ui) {
     // year = ui.value;
     updateLoan();
     vis.render();
   }
 );
+
+$("#buttons").buttonset();
 
 var i = 0,
     w = 560,
