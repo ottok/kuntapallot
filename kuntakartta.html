@@ -1,5 +1,6 @@
 <html>
   <head>
+  <meta charset="UTF-8" />
     <title>Kuntatalouspallot</title>
     <link type="text/css" rel="stylesheet" href="ex.css"/>
     <link type="text/css" rel="stylesheet" href="jquery-ui-1.8rc3.custom.css"/>
@@ -24,7 +25,7 @@
     </style>
   </head>
   <body><div id="center"><div id="fig">
-    <h1>Kuntatalouspallot</h1>
+    <h1>Talouspäättäjä, oletko värisokea?</h1>
     <div id="container">
       <b id="buttonslabel">Mittari:</b>
       <div id="buttons">
@@ -32,7 +33,7 @@
         <button id="btn_">Suhteellinen velka</button>
         <button id="btn_">Verotulot/asukas</button>
         <button id="btn_">Valtionosuus/asukas</button>
-        <button id="btn_">Tulovero-%</button>
+        <!-- button id="btn_">Tulovero-%</button -->
       </div>
     </div>
     <script type="text/javascript+protovis">
@@ -43,21 +44,17 @@ $(btn_laina).bind("click", function(e, ui) {
   }
 );
 
-fi_lowres.forEach(function(c) {
-  c.center = centroid(c.borders[0]);
-});
-
 var i = 0,
     w = 560,
-    h = 400,
+    h = 300,
     mapMargin = 30;
     
 
 var scale = pv.Geo.scale()
-    .domain({lng: -128, lat: 24}, {lng: -64, lat: 50})
+    .domain({lng: 20, lat: 40}, {lng: 30, lat: 65})
     .range({x: mapMargin, y: mapMargin}, {x: w-mapMargin, y: h-mapMargin});
 
-var legendMargin = 20,
+var legendMargin = 500,
     ease = null,
     yearsMargin = 100;
 
@@ -66,23 +63,21 @@ var yearsScale = pv.Scale.linear()
     .range(1, 9);
 
 var legendScale = pv.Scale.linear()
-    .domain(14, 35)
+    .domain(0, 4000)
     .range(legendMargin, w - legendMargin);
 
 var col = function(v) {
-  if (v < 17) return "#008038";
-  if (v < 20) return "#A3D396";
-  if (v < 23) return "#FDD2AA";
-  if (v < 26) return "#F7976B";
-  if (v < 29) return "#F26123";
-  if (v < 32) return "#E12816";
+  if (v < 500) return "#008038";
+  if (v < 1000) return "#A3D396";
+  if (v < 2000) return "#FDD2AA";
+  if (v < 3000) return "#F7976B";
+  if (v < 4000) return "#F26123";
+  if (v < 5000) return "#E12816";
     return "#B7161E"; // else
 };
 
 var numToRad = function(n) {
-  n = n.toString();
-  n = n.replace(/,([^,]*)$/, ".$1");
-  return Math.sqrt(n)*2;
+  return Math.sqrt(n)/20;
 };
 
 var nodes = [],
@@ -90,11 +85,15 @@ var nodes = [],
     links = [];
 
 fi_lowres.forEach(function(s) {
+// testaa object.values()
   if (fi_stats[s.name]) {
-    var x = scale(s.center).x,
-        y = scale(s.center).y,
-        numPop = fi_stats[s.name].asukasluku, // size of ball
+   asukasluku = fi_stats[s.name].asukasluku.toString().replace(/\./g, '')
+   center = {lat: parseFloat(fi_stats[s.name].lat), lng: parseFloat(fi_stats[s.name].long)};
+    var x = scale(center).x,
+        y = scale(center).y,
+        numPop = asukasluku, // size of ball
         n = {x: x, y: y, p: {x: x, y: y}, r: numToRad(numPop), name:s.name};
+
     nodes.push(n);
     codeToNode[s.name] = n;
   }
@@ -154,9 +153,10 @@ vis.add(pv.Dot)
     .left(function(d) d.x)
     .top(function(d) d.y)
     .radius(function(d) d.r)
-    .fillStyle(function(d) col(fi_stats[d.name].lainat_as))
+    .fillStyle(function(d) col( fi_stats[d.name].lainat_as.toString().replace(/\./g, '')
+))
     .strokeStyle(null)
-    .title(function(d) d.name + " (" + fi_stats[d.name].asukasluku + "): " + fi_stats[d.name].lainat_as + "e")
+    .title(function(d) d.name + " (" + fi_stats[d.name].asukasluku.toString().replace(/\./g, '') + "): " + fi_stats[d.name].lainat_as + "€")
    .add(pv.Label)
     .text(function(d) d.code)
     .textStyle("#fee")
@@ -166,10 +166,10 @@ vis.add(pv.Dot)
 
 vis.add(pv.Dot)
     .data([
-        {v: 500, l: "500K"},
-        {v: 100, l: "100K"},
-        {v: 50, l: "50K"},
-        {v: 10, l: "10K"}
+        {v: 500000, l: "500K"},
+        {v: 100000, l: "100K"},
+        {v: 50000, l: "50K"},
+        {v: 10000, l: "10K"}
       ])
     .fillStyle(null)
     .strokeStyle("#555")
@@ -181,16 +181,16 @@ vis.add(pv.Dot)
 
 // Add the color bars for the color legend
 vis.add(pv.Bar)
-    .data(pv.range(14,32.1,3))
-    .bottom(function(d) this.index * 15 - 28)
+    .data(pv.range(0,6000,1000))
+    .bottom(function(d) this.index * 20)
     .height(10)
     .width(10)
     .left(5)
-     .fillStyle(function(d) col(14 + 3 * this.index))
+     .fillStyle(function(d) col(0 + 1000 * this.index))
     .lineWidth(null)
   .anchor("right").add(pv.Label)
     .textAlign("left")
-    .text(function(d) d + " - " + (d+3) + "%");
+    .text(function(d) d + " - " + (d+999 )+ " €");
 
 ease = setInterval(function() {
   if (i++ > 140) {
