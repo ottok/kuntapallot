@@ -49,7 +49,7 @@ fi_lowres.forEach(function(c) {
 
 var i = 0,
     w = 560,
-    h = 600,
+    h = 400,
     mapMargin = 30;
     
 
@@ -82,7 +82,7 @@ var col = function(v) {
 var numToRad = function(n) {
   n = n.toString();
   n = n.replace(/,([^,]*)$/, ".$1");
-  return Math.sqrt(n)/10;
+  return Math.sqrt(n)*2;
 };
 
 var nodes = [],
@@ -93,8 +93,8 @@ fi_lowres.forEach(function(s) {
   if (fi_stats[s.name]) {
     var x = scale(s.center).x,
         y = scale(s.center).y,
-        numLoan = fi_stats[s.name].lainat_as,
-        n = {x: x, y: y, p: {x: x, y: y}, r: numToRad(numLoan), name:s.name};
+        numPop = fi_stats[s.name].asukasluku, // size of ball
+        n = {x: x, y: y, p: {x: x, y: y}, r: numToRad(numPop), name:s.name};
     nodes.push(n);
     codeToNode[s.name] = n;
   }
@@ -156,7 +156,7 @@ vis.add(pv.Dot)
     .radius(function(d) d.r)
     .fillStyle(function(d) col(fi_stats[d.name].lainat_as))
     .strokeStyle(null)
-    .title(function(d) d.name + ": " + fi_stats[d.name].lainat_as + " €")
+    .title(function(d) d.name + " (" + fi_stats[d.name].asukasluku + "): " + fi_stats[d.name].lainat_as + "e")
    .add(pv.Label)
     .text(function(d) d.code)
     .textStyle("#fee")
@@ -166,10 +166,10 @@ vis.add(pv.Dot)
 
 vis.add(pv.Dot)
     .data([
-        {v: 500000, l: "500K"},
-        {v: 100000, l: "100K"},
-        {v: 50000, l: "50K"},
-        {v: 10000, l: "10K"}
+        {v: 500, l: "500K"},
+        {v: 100, l: "100K"},
+        {v: 50, l: "50K"},
+        {v: 10, l: "10K"}
       ])
     .fillStyle(null)
     .strokeStyle("#555")
