@@ -35,11 +35,11 @@
     <div id="container">
       <b id="buttonslabel">Mittari:</b>
       <div id="buttons">
-		<input type="radio" id="radio1" name="mittari" checked="checked" /><label for="radio1">Lainat/asukas</label>
-		<input type="radio" id="radio2" name="mittari" /><label for="radio2">Suhteellinen velka</label>
-		<input type="radio" id="radio3" name="mittari" /><label for="radio3">Verotulot/asukas</label>
-		<input type="radio" id="radio4" name="mittari" /><label for="radio4">Valtionosuus/asukas</label>
-		<input type="radio" id="radio5" name="mittari" /><label for="radio5">Tulovero-%</label>
+<input type="radio" id="radio1" name="mittari" checked="checked" /><label for="radio1">Lainat/asukas</label>
+<input type="radio" id="radio2" name="mittari" /><label for="radio2">Suhteellinen velka</label>
+<input type="radio" id="radio3" name="mittari" /><label for="radio3">Verotulot/asukas</label>
+<input type="radio" id="radio4" name="mittari" /><label for="radio4">Valtionosuus/asukas</label>
+<input type="radio" id="radio5" name="mittari" /><label for="radio5">Tulovero-%</label>
       </div>
     </div>
     <script type="text/javascript+protovis">
