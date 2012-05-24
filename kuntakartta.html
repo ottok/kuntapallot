@@ -33,19 +33,21 @@
   <body><div id="center"><div id="fig">
     <h1>Talouspäättäjä, oletko värisokea?</h1>
     <div id="container">
+      <div class='linkki'><a href='kuntapallot_ennuste.html'>Huoltosuhde-ennusteet >></a><br/></div>
       <b id="buttonslabel">Mittari:</b>
       <div id="buttons">
-		<input type="radio" id="radio1" name="mittari" checked="checked" /><label for="radio1">Lainat/asukas</label>
-		<input type="radio" id="radio2" name="mittari" /><label for="radio2">Suhteellinen velka</label>
-		<input type="radio" id="radio3" name="mittari" /><label for="radio3">Verotulot/asukas</label>
-		<input type="radio" id="radio4" name="mittari" /><label for="radio4">Valtionosuus/asukas</label>
-		<input type="radio" id="radio5" name="mittari" /><label for="radio5">Tulovero-%</label>
+		<input type="radio" id="lainat" name="mittari" checked="checked" /><label for="lainat">Lainat/asukas</label>
+		<input type="radio" id="velka" name="mittari" /><label for="velka">Suhteellinen velka</label>
+		<input type="radio" id="verotulot" name="mittari" /><label for="verotulot">Verotulot/asukas</label>
+		<input type="radio" id="valtios" name="mittari" /><label for="valtios">Valtionosuus/asukas</label>
+		<input type="radio" id="tulovero" name="mittari" /><label for="tulovero">Tulovero-%</label>
       </div>
     </div>
     <script type="text/javascript+protovis">
 $("#buttons input").bind("click", function(e, ui) {
     // year = ui.value;
-    updateLoan();
+    console.log(e);
+    updateLoan(e.target.id);
     vis.render();
   }
 );
@@ -53,10 +55,14 @@ $("#buttons input").bind("click", function(e, ui) {
 $("#buttons").buttonset();
 
 var i = 0,
-    w = 560,
-    h = 500,
-    mapMargin = 10;
+    w = 500,
+    h = 600,
+    mapMargin = 40;
     
+var choice = 'suht_lainat';
+var yksikko = '€';
+var reversed = false;
+var asteikko = [500,1000,2000,3000,4000,5000];
 
 var scale = pv.Geo.scale()
     .domain({lng: 20, lat: 55}, {lng: 32, lat: 69})
@@ -75,13 +81,30 @@ var legendScale = pv.Scale.linear()
     .range(legendMargin, w - legendMargin);
 
 var col = function(v) {
-  if (v < 500) return "#008038";
-  if (v < 1000) return "#A3D396";
-  if (v < 2000) return "#FDD2AA";
-  if (v < 3000) return "#F7976B";
-  if (v < 4000) return "#F26123";
-  if (v < 5000) return "#E12816";
+
+switch(reversed){
+
+case true:
+  if (v > asteikko[0]) return "#008038";
+  if (v > asteikko[1]) return "#A3D396";
+  if (v > asteikko[2]) return "#FDD2AA";
+  if (v > asteikko[3]) return "#F7976B";
+  if (v > asteikko[4]) return "#F26123";
+  if (v > asteikko[5]) return "#E12816";
     return "#B7161E"; // else
+  break;
+  
+default:
+
+  if (v < asteikko[0]) return "#008038";
+  if (v < asteikko[1]) return "#A3D396";
+  if (v < asteikko[2]) return "#FDD2AA";
+  if (v < asteikko[3]) return "#F7976B";
+  if (v < asteikko[4]) return "#F26123";
+  if (v < asteikko[5]) return "#E12816";
+    return "#B7161E"; // else
+  break;
+}
 };
 
 var numToRad = function(n) {
@@ -108,12 +131,55 @@ fi_lowres.forEach(function(s) {
 });
 
 
-function updateLoan() {
-  nodes.forEach(function(n) n.r = numToRad(fi_stats[n.name].lainat_as));
+function updateLoan(target) {
+  switch(target){
+  	case "lainat": 
+  		choice = 'suht_lainat';
+  		yksikko = '€';
+  		reversed = false;
+  		asteikko = [500,1000,2000,3000,4000,5000];
+  		break;  
+  	
+  	case "velka": 
+  		choice = 'suht_velka';
+  		yksikko = '%';
+  		reversed = false;
+  		asteikko = [10,20,30,50,70,90];
+		break;  
+  	
+  	case "verotulot": 
+  		choice = 'suht_verotulot';
+  		yksikko = '€';
+  		reversed = true;
+  		asteikko = [5,4,2.5,2.5,2,1];
+		break;  
+  	
+  	case "valtios": 
+  		choice = 'suht_valt_osuudet';
+  		yksikko = '€';
+  		reversed = true;
+  		asteikko = [4,3,2.5,1.5,1,0.5];
+		break;  
+  	
+  	case "tulovero": 
+  		choice = 'veroprosentti';
+  		yksikko = '%';
+  		reversed = false;
+  		asteikko = [18,19,20,20,21,22];
+		break;  
+  	
+  	default: 
+  		choice = 'suht_lainat';
+  		yksikko = '€';
+  		reversed = false;
+  		asteikko = [500,1000,2000,3000,4000,5000];
+  		break;
+  }
+  nodes.forEach(function(n) n.r = numToRad(fi_stats[n.name].asukasluku));
   links.forEach(function(l) l.length = (l.sourceNode.r + l.targetNode.r + 2));
   i = 0;
   var stepSome = setInterval(function() {
-    if (i++ > 10) clearInterval(stepSome);
+    if (i++ > 200) clearInterval(stepSome);
     sim.step();
     vis.render();
   }, 20);
@@ -155,20 +221,18 @@ var vis = new pv.Panel()
     .top(0)
     .bottom(30);
 
-
 vis.add(pv.Dot)
     .data(nodes)
     .left(function(d) d.x)
     .top(function(d) d.y)
     .radius(function(d) d.r)
-    .fillStyle(function(d) col( fi_stats[d.name].lainat_as.toString().replace(/\./g, '')
-))
+    .fillStyle(function(d) col( fi_stats[d.name][choice]))
     .strokeStyle(null)
-    .title(function(d) d.name + " (" + fi_stats[d.name].asukasluku.toString().replace(/\./g, '') + "): " + fi_stats[d.name].lainat_as + "€")
+    .title(function(d) d.name + " (as. " + fi_stats[d.name].asukasluku.toString().replace(/\./g, '') + "), " + choice  + ' : ' + Math.round(fi_stats[d.name][choice]*100)/100 + yksikko) //rounding precision 2 decimals..
    .add(pv.Label)
-    .text(function(d) d.code)
+    .text(function(d) d.name)
     .textStyle("#fee")
-    .font(function(d) "bold " + (4*Math.log(d.r)).toFixed(0) + "px sans-serif")
+    .font(function(d) "bold " + (3*Math.log(d.r)).toFixed(0) + "px sans-serif")
     .textAlign("center")
     .textBaseline("middle");
 
@@ -189,19 +253,19 @@ vis.add(pv.Dot)
 
 // Add the color bars for the color legend
 vis.add(pv.Bar)
-    .data(pv.range(0,6000,1000))
+    .data(pv.range(0, asteikko[5], asteikko[1]))
     .bottom(function(d) this.index * 20)
     .height(10)
     .width(10)
     .left(5)
-     .fillStyle(function(d) col(0 + 1000 * this.index))
+     .fillStyle(function(d) col(0 + asteikko[this.index]))
     .lineWidth(null)
   .anchor("right").add(pv.Label)
     .textAlign("left")
-    .text(function(d) d + " - " + (d+999 )+ " €");
+    .text(function(d) choice + " < " + (asteikko[this.index]) + yksikko);
 
 ease = setInterval(function() {
-  if (i++ > 200) {
+  if (i++ > 500) {
     clearInterval(ease);
     ease = null;
   }

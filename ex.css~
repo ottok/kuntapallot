@@ -16,6 +16,10 @@ body {
   margin: auto;
 }
 
+#buttonslabel {
+  text-align: left;
+}
+
 .linkki {
 	width: 100%;
 	padding-right: 100px;

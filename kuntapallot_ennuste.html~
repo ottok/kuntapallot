@@ -6,7 +6,7 @@
     <link type="text/css" rel="stylesheet" href="jquery-ui-1.8rc3.custom.css"/>
     <script type="text/javascript" src="protovis-r3.2.js"></script>
     <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="jquery-ui-1.8rc3.custom.min.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.8.20.custom.min.js"></script>
     <script type="text/javascript" src="centroid.js"></script>
     <script type="text/javascript" src="fi_lowres.js"></script>
     <script type="text/javascript" src="fi_stats.js"></script>
@@ -21,7 +21,7 @@
 }
 
 #container {
-  height: 20px;
+  height: 40px;
 }
 
 
@@ -48,9 +48,11 @@
     </style>
   </head>
   <body><div id="center"><div id="fig">
+  <h1>Huoltosuhde - ennusteet v. 2010-2040</h1>
     <div id="container">
-      <b id="yearLabel">Year:</b
-      ><div id="yearSlider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"></div
+    <div class='linkki'><a href='kuntakartta.html'>Kuntien nykytila >></a><br/></div>
+      <b id="yearLabel">Vuosi:</b
+      ><div id="yearSlider" ></div
       ><img id="play" src="play.png" alt="Play" onclick="playClick()">
     </div>
     <script type="text/javascript+protovis">
@@ -59,6 +61,8 @@ $(yearSlider).slider({
   min: 2010,
   max: 2040,
   value: 2010,
+  step: 5,
+  
   slide: function(e, ui) {
     year = ui.value;
     updateYear();
@@ -70,8 +74,8 @@ var year = 2010;
 
 var i = 0,
     w = 560,
-    h = 500,
-    mapMargin = 50;
+    h = 860,
+    mapMargin = 20;
     
 
 var scale = pv.Geo.scale()
@@ -83,11 +87,11 @@ var legendMargin = 20,
     yearsMargin = 5;
 
 var yearsScale = pv.Scale.linear()
-    .domain(210, 240)
-    .range(115, 460);
+    .domain([2010,2015,2020,2025,2030,2035,2040])
+    .range(105, 460);
 
 var legendScale = pv.Scale.linear()
-    .domain(0, 100)
+    .domain([2010,2015,2020,2025,2030,2035,2040])
     .range(legendMargin, w - legendMargin);
 
 var col = function(v) {
@@ -112,7 +116,7 @@ var nodes = [],
 fi_lowres.forEach(function(s) {
 // testaa object.values()
   if (fi_stats[s.name]) {
-   asukasluku = fi_stats_ennuste[s.name]["as_" + year].toString().replace(/\./g, '')
+   asukasluku = fi_stats_ennuste[s.name]["as_" + year]
    center = {lat: parseFloat(fi_stats[s.name].lat), lng: parseFloat(fi_stats[s.name].long)};
     var x = scale(center).x,
         y = scale(center).y,
@@ -181,7 +185,7 @@ var vis = new pv.Panel()
 
 // Add the ticks and labels for the year slider
 vis.add(pv.Rule)
-     .data(pv.range(2010, 2040 + .1))
+     .data([2010, 2015,2020,2025,2030,2035,2040])
      .left(yearsScale)
      .height(4)
      .top(-40)
@@ -192,13 +196,13 @@ vis.add(pv.Dot)
     .left(function(d) d.x)
     .top(function(d) d.y)
     .radius(function(d) d.r)
-    .fillStyle(function(d) col( fi_stats_ennuste[d.name]["h_suhde_" + year].toString()))
+    .fillStyle(function(d) col( fi_stats_ennuste[d.name]["h_suhde_" + year]))
     .strokeStyle(null)
-    .title(function(d) d.name + " vuonna " + year + ": " + fi_stats_ennuste[d.name]["as_" + year].toString().replace(/\./g, '') + " asukasta,  Huoltosuhde: " + fi_stats_ennuste[d.name]["h_suhde_" + year])
+    .title(function(d) d.name + " vuonna " + year + ": " + fi_stats_ennuste[d.name]["as_" + year] + " asukasta,  Huoltosuhde: " + fi_stats_ennuste[d.name]["h_suhde_" + year])
    .add(pv.Label)
-    .text(function(d) d.code)
+    .text(function(d) d.name)
     .textStyle("#fee")
-    .font(function(d) "bold " + (4*Math.log(d.r)).toFixed(0) + "px sans-serif")
+    .font(function(d) "bold " + (3*Math.log(d.r)).toFixed(0) + "px sans-serif")
     .textAlign("center")
     .textBaseline("middle");
 
